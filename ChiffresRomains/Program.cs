@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.Linq;
 
 namespace ChiffresRomains
 {
@@ -140,72 +139,64 @@ namespace ChiffresRomains
 
                         int currentValue = romanToArabic[character];
 
-                        if (i > 0)
+                        if (i == 0)
                         {
-                            int previousValue = romanToArabic[userInput[i - 1].ToString()];
-                            if (previousValue > currentValue)
+                            // add the arabic value fitting the character
+                            addition.Add(currentValue);
+                            continue;
+                        }
+
+                        int previousValue = romanToArabic[userInput[i - 1].ToString()];
+                        if (previousValue > currentValue)
+                        {
+                            // réfléchir pour choper ici l'exception VIX
+                            same = 0;
+                            addition.Add(currentValue);
+                        }
+                        else if (previousValue == currentValue)
+                        {
+                            if (currentValue == 1 || currentValue == 10 || currentValue == 100 || currentValue == 1000)
                             {
-                                // réfléchir pour choper ici l'exception VIX
-                                same = 0;
-                                addition.Add(currentValue);
-                            }
-                            else if (previousValue == currentValue)
-                            {
-                                if (currentValue == 1 || currentValue == 10 || currentValue == 100 || currentValue == 1000)
-                                {
-                                    same += 1;
-                                    addition.Add(currentValue);
-                                }
-                                else
+                                same += 1;
+                                if (same > 2)
                                 {
                                     validity = false;
                                     break;
                                 }
+                                addition.Add(currentValue);
                             }
                             else
                             {
-                                // if this is not the end of the user input
-                                if (i < userInput.Count() - 1)
-                                {
-                                    if (userInput[i - 1] == userInput[i + 1])
-                                    {
-                                        validity = false;
-                                        break;
-                                    }
-                                }
-
-                                string completeCharacter = userInput.Substring(i - 1, 2);
-
-                                same = 0;
-                                if (!isSubstringInDict(completeCharacter, romanToArabic.Keys.ToList()))
-                                {
-                                    validity = false;
-                                    break;
-                                }
-                                addition.RemoveAt(addition.Count() - 1);
-                                addition.Add(romanToArabic[completeCharacter]);
+                                validity = false;
+                                break;
                             }
                         }
                         else
                         {
-                            // add the arabic value fitting the character
-                            addition.Add(currentValue);
-                        }
+                            // if this is not the end of the user input
+                            if (i < userInput.Count() - 1)
+                            {
+                                if (userInput[i - 1] == userInput[i + 1])
+                                {
+                                    validity = false;
+                                    break;
+                                }
+                            }
 
-                        if (same > 2)
-                        {
-                            validity = false;
-                            break;
-                        }
+                            string completeCharacter = userInput.Substring(i - 1, 2);
 
+                            same = 0;
+                            if (!isSubstringInDict(completeCharacter, romanToArabic.Keys.ToList()))
+                            {
+                                validity = false;
+                                break;
+                            }
+                            addition.RemoveAt(addition.Count() - 1);
+                            addition.Add(romanToArabic[completeCharacter]);
+                        }
                     }
 
-                    if (validity)
-                    {
-                        validity = checkValidityOfTheList(addition);
-                    }
-
-                    if (!validity)
+                    if (!validity || !checkValidityOfTheList(addition))
                     {
                         Console.WriteLine("This number is not valid. Try again.");
                         continue;
@@ -218,7 +209,6 @@ namespace ChiffresRomains
                 else
                 {
                     // try to make a class for "Arabic Numbers" with properties like the dict and method to convert
-                    Console.WriteLine("The number you entered is arabic.");
                     int userInt = Convert.ToInt32(userInput);
                     string result = ConvertToRoman(userInt, arabicToRoman);
                     Console.WriteLine($"{userInt} = {result}");
